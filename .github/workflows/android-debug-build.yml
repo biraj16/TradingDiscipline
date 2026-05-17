@@ -18,7 +18,7 @@ jobs:
         run: |
           pwd
           ls -la
-          find . -maxdepth 3 -name "settings.gradle.kts" -o -name "build.gradle.kts"
+          find . -maxdepth 3 \( -name "settings.gradle.kts" -o -name "build.gradle.kts" -o -name "libs.versions.toml" \)
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -30,7 +30,8 @@ jobs:
         uses: android-actions/setup-android@v4
 
       - name: Install Android SDK packages
-        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+        run: |
+          sdkmanager "platforms;android-36" "build-tools;36.0.0"
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6
@@ -38,9 +39,10 @@ jobs:
           gradle-version: '9.4.1'
 
       - name: Build debug APK
-        run: gradle :app:assembleDebug --stacktrace
+        run: gradle :app:assembleDebug --stacktrace --info
 
       - name: Upload APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: TradingDisciplineIncharge-debug-apk
